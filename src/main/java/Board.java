@@ -57,13 +57,8 @@ public class Board extends Prototype<Board> {
     public String toString() {
         String result = "";
         for (int y = minIndex; y <= maxIndex; y++) {
-            result += "|";
-            for (int x = minIndex; x <= maxIndex; x++) {
-                SudokuRow currentRow = sudokuBoard.get(y);
-                SudokuElement currentElement = currentRow.getElement(x);
-                result += currentElement.toString();
-                result += "|";
-            }
+            SudokuRow currentRow = sudokuBoard.get(y);
+            result += currentRow.toString();
             result += "\n";
         }
         return result;
@@ -91,12 +86,15 @@ public class Board extends Prototype<Board> {
     }
 
     public String findElement(SudokuElement elementSearchedFor) {
+        Position position = new Position();
         int horizontalPosition = 0;
         int verticalPosition = 0;
         boolean found = false;
 
         for (SudokuRow sudokuRow : sudokuBoard) {
             horizontalPosition += 1;
+            position.setHorizontal(position.getHorizontal()+1);
+
             verticalPosition = 0;
             for (SudokuElement sudokuElement : sudokuRow.getOneRow()) {
                 verticalPosition += 1;
@@ -112,7 +110,18 @@ public class Board extends Prototype<Board> {
         return horizontalPosition + "," + verticalPosition;
     }
 
-    public int emptyElements() {
+    private int checkInRow(SudokuElement elementSearchedFor ,SudokuRow sudokuRow) {
+        int verticalPosition = 0;
+        for (SudokuElement sudokuElement : sudokuRow.getOneRow()) {
+            verticalPosition += 1;
+            if (sudokuElement.equals(elementSearchedFor)) {
+                break;
+            }
+        }
+        return verticalPosition;
+    }
+
+    public int countEmptyElements() {
         return (int) sudokuBoard.stream()
                 .flatMap(l -> l.getOneRow().stream())
                 .filter(t -> t.getValue() == -1)

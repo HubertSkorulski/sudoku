@@ -40,4 +40,8 @@ public class SudokuElement {
             setValue(newValue);
         }
     }
+
+    public void setLastPossibleValue() {
+        setValue(possibleValues.get(0));
+    }
 }

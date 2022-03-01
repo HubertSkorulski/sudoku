@@ -1,4 +1,4 @@
-public class BeforeGuessing {
+public class StateBeforeGuessing {
     private Board board;
     private SudokuElement sudokuElement;
     private String coordinates;

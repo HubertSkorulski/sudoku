@@ -17,24 +17,18 @@ public class SudokuSolver {
     }
 
     public void prepareValuesInElements() {
-        rowToListAndRemovePossibleValues();
-        columnToListAndRemovePossibleValues();
+        removePossibleValuesFromRow();
+        removePossibleValuesFromColumn();
         squareToListAndRemovePossibleValues();
     }
     
     public boolean settingOccurred() {
 
-        List<Integer> boardPreviousValues = board.getSudokuBoard().stream()
-                .flatMap(l -> l.getOneRow().stream())
-                .map(SudokuElement::getValue)
-                .collect(Collectors.toList());
+        List<Integer> boardPreviousValues = boardToList(board);
 
         settingValues();
 
-        List<Integer> boardCurrentValues = board.getSudokuBoard().stream()
-                .flatMap(l -> l.getOneRow().stream())
-                .map(SudokuElement::getValue)
-                .collect(Collectors.toList());
+        List<Integer> boardCurrentValues = boardToList(board);
 
         if (boardPreviousValues.equals(boardCurrentValues)) {
             return false;
@@ -43,12 +37,19 @@ public class SudokuSolver {
         }
     }
 
+    public List<Integer> boardToList(Board board) {
+        return board.getSudokuBoard().stream()
+                .flatMap(l -> l.getOneRow().stream())
+                .map(SudokuElement::getValue)
+                .collect(Collectors.toList());
+    }
+
     public void settingValues() {
         boolean set = false;
         for (SudokuRow sudokuRow : board.getSudokuBoard()) {
             for (SudokuElement sudokuElement : sudokuRow.getOneRow()) {
-                if (sudokuElement.getPossibleValues().size() == 1 && sudokuElement.getValue() == -1) {
-                    sudokuElement.setValue(sudokuElement.getPossibleValues().get(0));
+                if (fieldIsEmptyAndOnePossibleValueLeft(sudokuElement)) {
+                    sudokuElement.setLastPossibleValue();
                     set = true;
                     break;
                 }
@@ -57,6 +58,15 @@ public class SudokuSolver {
                 break;
             }
         }
+    }
+
+    private boolean fieldIsEmptyAndOnePossibleValueLeft (SudokuElement sudokuElement) {
+        if (sudokuElement.getPossibleValues().size() == 1 && sudokuElement.getValue() == -1) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     public void squareToListAndRemovePossibleValues() {
@@ -75,18 +85,31 @@ public class SudokuSolver {
         }
     }
 
-    public void columnToListAndRemovePossibleValues() {
+    public void removePossibleValuesFromColumn() {
+        List<SudokuElement> columnItems = new ArrayList<>();
         for (int n =0; n<9; n++) {
-            List<SudokuElement> columnItems = new ArrayList<>();
+            columnItems = columnToList(board,n);
+            removePossibleValuesFromList(columnItems);
+            columnItems.clear();
+            /*List<SudokuElement> columnItems = new ArrayList<>();
             for (SudokuRow row : board.getSudokuBoard()) {
                 columnItems.add(row.getElement(n));
             }
             removePossibleValuesFromList(columnItems);
-            columnItems.clear();
+            columnItems.clear();*/
         }
     }
-    public void rowToListAndRemovePossibleValues() {
 
+    public List<SudokuElement> columnToList(Board board, int columnNumber) {
+        List<SudokuElement> columnItems = new ArrayList<>();
+        for (SudokuRow row : board.getSudokuBoard()) {
+            columnItems.add(row.getElement(columnNumber));
+        }
+        return columnItems;
+    }
+
+
+    public void removePossibleValuesFromRow() {
         for (SudokuRow sudokuRow : board.getSudokuBoard()) {
             removePossibleValuesFromList(sudokuRow.getOneRow());
         }
@@ -185,7 +208,7 @@ public class SudokuSolver {
         }
 
     }
-    public Board setPreviousStateAndGetAdjustedBoard(BeforeGuessing previousState) {
+    public Board setPreviousStateAndGetAdjustedBoard(StateBeforeGuessing previousState) {
 
         String coordinates = previousState.getCoordinates();
         Board board = previousState.getBoard();
