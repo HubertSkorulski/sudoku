@@ -12,5 +12,4 @@ public class SudokuRowTestSuite {
         //Then
         Assertions.assertEquals(expectedRow, sudokuRow.toString());
     }
-
 }

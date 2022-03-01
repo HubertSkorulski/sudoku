@@ -44,4 +44,16 @@ public class SudokuElement {
     public void setLastPossibleValue() {
         setValue(possibleValues.get(0));
     }
+
+    public boolean isEmpty() {
+        if (getValue() == -1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void removeFromPossibleValues(int value) {
+        getPossibleValues().remove(Integer.valueOf(value));
+    }
 }

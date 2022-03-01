@@ -15,44 +15,48 @@ public class Board extends Prototype<Board> {
     }
 
     public SudokuElement getSudokuElement(int horizontalPosition, int verticalPosition) {
-        SudokuRow chosenRow = sudokuBoard.get(verticalPosition);
-        return chosenRow.getElement(horizontalPosition);
+        SudokuRow chosenRow = sudokuBoard.get(verticalPosition-1);
+        return chosenRow.getElement(horizontalPosition-1);
     }
 
     public void setDigit() {
         boolean setting = true;
         Scanner scanner = new Scanner(System.in);
-        System.out.println(toString());
+        System.out.println(this);
 
         while (setting) {
             System.out.println("Enter parameters in the format: 'Vertical Position, Horizontal Position, Value'"
                     + "\n" +"If you want to solve SUDOKU, enter 'SUDOKU'");
             String input = scanner.nextLine();
-            if (input.toUpperCase().equals("SUDOKU")) {
+            if (input.equalsIgnoreCase("SUDOKU")) {
                 setting = false;
             } else {
-                try {
-                    int value = Character.getNumericValue(input.charAt(4));
-                    int horizontalPosition = Character.getNumericValue(input.charAt(2));
-                    int verticalPosition = Character.getNumericValue(input.charAt(0));
-
-                    SudokuRow chosenRow = sudokuBoard.get(verticalPosition-1);
-                    SudokuElement chosenElement = chosenRow.getElement(horizontalPosition-1);
-
-                    if (chosenElement.getValue() == -1) {
-                        if (chosenElement.getPossibleValues().contains(value)) {
-                            chosenElement.setValue(value);
-                        }
-                    } else {
-                        System.out.println("This place has already existing value!");
-                    }
-                    System.out.println(toString());
-                } catch (Exception e) {
-                    System.out.println("Enter parameters correctly");
-                }
+                Input adjustedInput = new Input(input);
+                handleTheInput(adjustedInput);
+                System.out.println(this);
             }
         }
     }
+
+    public void handleTheInput(Input input) {
+        if (input.isCorrect()) {
+            int value = input.getValue();
+            int horizontalPos = input.getHorizontalPos();
+            int verticalPos = input.getVerticalPos();
+
+            SudokuElement chosenElement = getSudokuElement(horizontalPos,verticalPos);
+
+            if (chosenElement.isEmpty()) {
+                chosenElement.setValue(value);
+            } else {
+                System.out.println("This place is already taken");
+            }
+
+        } else {
+            System.out.println("Enter parameters correctly");
+        }
+    }
+
 
     public String toString() {
         String result = "";
@@ -74,56 +78,38 @@ public class Board extends Prototype<Board> {
         clonedBoard.sudokuBoard = new ArrayList<>();
         for (SudokuRow sudokuRow : sudokuBoard) {
             SudokuRow clonedRow = new SudokuRow();
-            clonedRow.getOneRow().clear();
-            for (SudokuElement sudokuElement : sudokuRow.getOneRow()) {
+            clonedRow.getRow().clear();
+            for (SudokuElement sudokuElement : sudokuRow.getRow()) {
                 SudokuElement clonedElement = new SudokuElement();
                 clonedElement.setValue(sudokuElement.getValue());
-                clonedRow.getOneRow().add(clonedElement);
+                clonedRow.getRow().add(clonedElement);
             }
             clonedBoard.getSudokuBoard().add(clonedRow);
         }
         return clonedBoard;
     }
 
-    public String findElement(SudokuElement elementSearchedFor) {
+    public Position findElement(SudokuElement elementSearchedFor) {
         Position position = new Position();
-        int horizontalPosition = 0;
-        int verticalPosition = 0;
-        boolean found = false;
+        int verticalPos = -1;
+        int horizontalPos = -1;
 
         for (SudokuRow sudokuRow : sudokuBoard) {
-            horizontalPosition += 1;
-            position.setHorizontal(position.getHorizontal()+1);
+            verticalPos = sudokuBoard.indexOf(sudokuRow);
+            horizontalPos = sudokuRow.getRow().indexOf(elementSearchedFor);
 
-            verticalPosition = 0;
-            for (SudokuElement sudokuElement : sudokuRow.getOneRow()) {
-                verticalPosition += 1;
-                if (sudokuElement.equals(elementSearchedFor)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (found) {
+            if (horizontalPos != -1) {
                 break;
             }
         }
-        return horizontalPosition + "," + verticalPosition;
-    }
-
-    private int checkInRow(SudokuElement elementSearchedFor ,SudokuRow sudokuRow) {
-        int verticalPosition = 0;
-        for (SudokuElement sudokuElement : sudokuRow.getOneRow()) {
-            verticalPosition += 1;
-            if (sudokuElement.equals(elementSearchedFor)) {
-                break;
-            }
-        }
-        return verticalPosition;
+        position.setHorizontal(horizontalPos);
+        position.setVertical(verticalPos);
+        return position;
     }
 
     public int countEmptyElements() {
         return (int) sudokuBoard.stream()
-                .flatMap(l -> l.getOneRow().stream())
+                .flatMap(l -> l.getRow().stream())
                 .filter(t -> t.getValue() == -1)
                 .count();
     }

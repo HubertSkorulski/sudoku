@@ -10,7 +10,6 @@ public class SudokuGame {
 
     public void processingSudoku(){
         int tries = 0;
-        sudokuSolver.exampleParameters();
         board.setDigit();
         if (sudokuSolver.correctBoard()) {
             while (board.countEmptyElements() != 0) {
@@ -21,7 +20,7 @@ public class SudokuGame {
                 } else {
                     tries = 0;
                 }
-                if (tries > 2) { //to zrobić na guessing process
+                if (tries > 2) {
                     StateBeforeGuessing stateBeforeGuessing = new StateBeforeGuessing();
                     saveBoard(stateBeforeGuessing);
                     SudokuElement guessedElement = sudokuSolver.guessTheValue();
@@ -54,10 +53,10 @@ public class SudokuGame {
         while (!correctAnswer) {
             System.out.println("Wanna play again? Yes or No?");
             String answer = scan.nextLine();
-            if (answer.toUpperCase().equals("YES")) {
+            if (answer.equalsIgnoreCase("YES")) {
                 correctAnswer = true;
                 gameFinished = false;
-            } else if (answer.toUpperCase().equals("NO")) {
+            } else if (answer.equalsIgnoreCase("NO")) {
                 System.out.println("Thanks for playing");
                 correctAnswer = true;
                 gameFinished = true;
@@ -71,7 +70,7 @@ public class SudokuGame {
     public void definePreviousState(StateBeforeGuessing stateBeforeGuessing, SudokuElement guessedElement) {
         states.add(stateBeforeGuessing);
         stateBeforeGuessing.setGuessedElement(guessedElement);
-        stateBeforeGuessing.setCoordinates(board.findElement(guessedElement));
+        stateBeforeGuessing.setPosition(board.findElement(guessedElement));
     }
 
     public Board useBoardFromPreviousState(StateBeforeGuessing previousState) {

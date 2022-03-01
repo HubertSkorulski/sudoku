@@ -1,7 +1,7 @@
 public class StateBeforeGuessing {
     private Board board;
     private SudokuElement sudokuElement;
-    private String coordinates;
+    private Position position;
 
     public Board getBoard() {
         return board;
@@ -19,11 +19,11 @@ public class StateBeforeGuessing {
         this.sudokuElement = sudokuElement;
     }
 
-    public String getCoordinates() {
-        return coordinates;
+    public Position getPosition() {
+        return position;
     }
 
-    public void setCoordinates(String coordinates) {
-        this.coordinates = coordinates;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }

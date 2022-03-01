@@ -19,7 +19,7 @@ public class SudokuSolver {
     public void prepareValuesInElements() {
         removePossibleValuesFromRow();
         removePossibleValuesFromColumn();
-        squareToListAndRemovePossibleValues();
+        removePossibleValuesFromSquares();
     }
     
     public boolean settingOccurred() {
@@ -39,7 +39,7 @@ public class SudokuSolver {
 
     public List<Integer> boardToList(Board board) {
         return board.getSudokuBoard().stream()
-                .flatMap(l -> l.getOneRow().stream())
+                .flatMap(l -> l.getRow().stream())
                 .map(SudokuElement::getValue)
                 .collect(Collectors.toList());
     }
@@ -47,7 +47,7 @@ public class SudokuSolver {
     public void settingValues() {
         boolean set = false;
         for (SudokuRow sudokuRow : board.getSudokuBoard()) {
-            for (SudokuElement sudokuElement : sudokuRow.getOneRow()) {
+            for (SudokuElement sudokuElement : sudokuRow.getRow()) {
                 if (fieldIsEmptyAndOnePossibleValueLeft(sudokuElement)) {
                     sudokuElement.setLastPossibleValue();
                     set = true;
@@ -69,34 +69,32 @@ public class SudokuSolver {
 
     }
 
-    public void squareToListAndRemovePossibleValues() {
-        List<SudokuElement> elementList = new ArrayList<>();
-
-        for (int hor=0; hor <9; hor= hor + 3) {
-            for (int ver = 0; ver < 9; ver = ver + 3) {
-                for (int y = ver; y < 3 + ver; y = y + 1) {
-                    for (int x = hor; x < 3 + hor; x = x + 1) {
-                        elementList.add(board.getSudokuElement(x, y));
-                    }
-                }
-                removePossibleValuesFromList(elementList);
-                elementList.clear();
+    public void removePossibleValuesFromSquares() {
+        List<SudokuElement> elementsList;
+        for (int hor=1; hor <10; hor= hor + 3) {
+            for (int ver = 1; ver < 10; ver = ver + 3) {
+                elementsList = squareToList(ver,hor);
+                removePossibleValuesFromList(elementsList);
+                elementsList = new ArrayList<>();
             }
         }
     }
 
+    public List<SudokuElement> squareToList(int ver, int hor) {
+        List<SudokuElement> elementList = new ArrayList<>();
+        for (int y = ver; y < 3 + ver; y = y + 1) {
+            for (int x = hor; x < 3 + hor; x = x + 1) {
+                elementList.add(board.getSudokuElement(x, y));
+            }
+        }
+        return elementList;
+    }
+
     public void removePossibleValuesFromColumn() {
-        List<SudokuElement> columnItems = new ArrayList<>();
         for (int n =0; n<9; n++) {
-            columnItems = columnToList(board,n);
+            List<SudokuElement> columnItems = columnToList(board,n);
             removePossibleValuesFromList(columnItems);
             columnItems.clear();
-            /*List<SudokuElement> columnItems = new ArrayList<>();
-            for (SudokuRow row : board.getSudokuBoard()) {
-                columnItems.add(row.getElement(n));
-            }
-            removePossibleValuesFromList(columnItems);
-            columnItems.clear();*/
         }
     }
 
@@ -108,75 +106,27 @@ public class SudokuSolver {
         return columnItems;
     }
 
-
     public void removePossibleValuesFromRow() {
         for (SudokuRow sudokuRow : board.getSudokuBoard()) {
-            removePossibleValuesFromList(sudokuRow.getOneRow());
+            removePossibleValuesFromList(sudokuRow.getRow());
         }
     }
 
     public void removePossibleValuesFromList(List<SudokuElement> elementList) {
-        for (SudokuElement sudokuElement:elementList){
+        for (SudokuElement sudokuElement : elementList){
             int currentElementValue = sudokuElement.getValue();
             for (SudokuElement otherElement:elementList) {
-                otherElement.getPossibleValues().remove(Integer.valueOf(currentElementValue));
+                otherElement.removeFromPossibleValues(currentElementValue);
             }
         }
     }
-
-    public void exampleSetting(int x, int y, int value) {
-        SudokuRow sudokuRow = board.getSudokuBoard().get(y-1);
-        SudokuElement sudokuElement = sudokuRow.getElement(x-1);
-        sudokuElement.setValue(value);
-    }
-
-    public void exampleParameters() {
-        /*exampleSetting(1,2,4);
-        exampleSetting(1,6,8);
-        exampleSetting(1,8,3);
-        exampleSetting(2,1,3);
-        exampleSetting(1,4,6);
-        //exampleSetting(2,2,8);
-        //exampleSetting(2,4,7);
-        //exampleSetting(2,7,4);
-        exampleSetting(3,1,7);
-        //exampleSetting(3,2,9);
-        exampleSetting(3,4,2);
-        exampleSetting(3,6,4);
-        //exampleSetting(3,7,6);
-        //exampleSetting(4,2,6);
-        exampleSetting(4,3,4);
-        exampleSetting(4,4,5);
-        //exampleSetting(4,5,7);
-        //exampleSetting(4,6,2);
-        exampleSetting(4,9,8);
-        exampleSetting(5,1,8);
-        //exampleSetting(5,2,5);
-        exampleSetting(5,8,7);
-        exampleSetting(6,4,8);
-        //exampleSetting(6,5,9);
-        exampleSetting(6,6,3);
-        //exampleSetting(7,4,4);
-        exampleSetting(7,6,5);
-        //exampleSetting(7,7,1);
-        exampleSetting(7,9,3);
-        //exampleSetting(8,1,5);
-        //exampleSetting(8,4,9);
-        //exampleSetting(8,6,1);
-        //exampleSetting(8,9,4);
-        //exampleSetting(9,3,1);
-        //exampleSetting(9,5,6);
-        //exampleSetting(9,6,7);
-        //exampleSetting(9,7,8);*/
-    }
-
 
     public SudokuElement guessTheValue() {
         boolean guessedAndSet = false;
         SudokuElement guessedElement = null;
 
         for (SudokuRow sudokuRow : board.getSudokuBoard()) {
-            for (SudokuElement sudokuElement : sudokuRow.getOneRow()) {
+            for (SudokuElement sudokuElement : sudokuRow.getRow()) {
                 if (sudokuElement.getValue() == -1 && sudokuElement.getPossibleValues().size() > 1) {
                     Random rand = new Random();
                     List<Integer> possibleValues = sudokuElement.getPossibleValues();
@@ -197,7 +147,7 @@ public class SudokuSolver {
 
     public boolean valid() {
         int wrongElements = (int) board.getSudokuBoard().stream()
-                .flatMap(l -> l.getOneRow().stream())
+                .flatMap(l -> l.getRow().stream())
                 .filter(t -> t.getValue() == -1)
                 .filter(t -> t.getPossibleValues().size() == 0)
                 .count();
@@ -210,12 +160,12 @@ public class SudokuSolver {
     }
     public Board setPreviousStateAndGetAdjustedBoard(StateBeforeGuessing previousState) {
 
-        String coordinates = previousState.getCoordinates();
+        Position position = previousState.getPosition();
         Board board = previousState.getBoard();
 
         SudokuSolver sudokuSolver = new SudokuSolver(board);
-        int horizontalPosition = Character.getNumericValue(coordinates.charAt(2))-1;
-        int verticalPosition = Character.getNumericValue(coordinates.charAt(0))-1;
+        int horizontalPosition = position.getHorizontal();
+        int verticalPosition = position.getVertical();
 
         SudokuElement elementToRemovePossibleValue = board.getSudokuElement(horizontalPosition,verticalPosition);
         sudokuSolver.prepareValuesInElements();
@@ -231,7 +181,7 @@ public class SudokuSolver {
         List<Integer> squareItems = new ArrayList<>();
 
         for (SudokuRow sudokuRow : board.getSudokuBoard()) {
-            List<Integer> elementsValues = sudokuRow.getOneRow().stream()
+            List<Integer> elementsValues = sudokuRow.getRow().stream()
                     .map(SudokuElement::getValue)
                     .collect(Collectors.toList());
 
@@ -255,8 +205,8 @@ public class SudokuSolver {
             }
         }
          if (correct) {
-            for (int hor=0; hor <9; hor= hor + 3) {
-                for (int ver = 0; ver < 9; ver = ver + 3) {
+            for (int hor=1; hor <10; hor= hor + 3) {
+                for (int ver = 1; ver < 10; ver = ver + 3) {
                     for (int y = ver; y < 3 + ver; y = y + 1) {
                         for (int x = hor; x < 3 + hor; x = x + 1) {
                             squareItems.add(board.getSudokuElement(x, y).getValue());
