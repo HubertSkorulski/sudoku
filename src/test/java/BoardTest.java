@@ -9,12 +9,16 @@ class BoardTest {
     void findElementTest() {
         //Given
         Board board = new Board();
-        SudokuElement sudokuElement = board.getSudokuBoard().get(1).getElement(2);
+        int horizontalPos = 2;
+        int verticalPos = 3;
+        int horIndex = horizontalPos - 1;
+        int verIndex = verticalPos - 1;
+        SudokuElement sudokuElement = board.getSudokuBoard().get(verIndex).getElement(horIndex);
         //When
-        Position position = board.findElement(sudokuElement);
+        Position position = board.getElementPosition(sudokuElement);
         //Then
-        Assertions.assertEquals(1,position.getVertical());
-        Assertions.assertEquals(2,position.getHorizontal());
+        Assertions.assertEquals(verticalPos,position.getVertical());
+        Assertions.assertEquals(horizontalPos,position.getHorizontal());
     }
 
     @Test
@@ -42,4 +46,35 @@ class BoardTest {
         System.out.println(board);
         Assertions.assertEquals(-1,setValue);
     }
+
+    @Test
+    void hasWrongElementsTest() {
+        //Given
+        Board board = new Board();
+        //When
+        boolean check = board.hasWrongElements();
+        //Then
+        Assertions.assertFalse(check);
+    }
+
+    @Test
+    void hasWrongElements2Test() {
+        //Given
+        Board board = new Board();
+        SudokuElement sudokuElement = board.getSudokuElement(1,1);
+        sudokuElement.removeFromPossibleValues(1);
+        sudokuElement.removeFromPossibleValues(2);
+        sudokuElement.removeFromPossibleValues(3);
+        sudokuElement.removeFromPossibleValues(4);
+        sudokuElement.removeFromPossibleValues(5);
+        sudokuElement.removeFromPossibleValues(6);
+        sudokuElement.removeFromPossibleValues(7);
+        sudokuElement.removeFromPossibleValues(8);
+        sudokuElement.removeFromPossibleValues(9);
+        //When
+        boolean check = board.hasWrongElements();
+        //Then
+        Assertions.assertTrue(check);
+    }
+
 }

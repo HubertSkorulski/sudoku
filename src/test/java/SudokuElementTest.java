@@ -8,7 +8,7 @@ class SudokuElementTest {
         //Given
         SudokuElement sudokuElement = new SudokuElement();
         //When
-        sudokuElement.guessTheValueInElement();
+        sudokuElement.guessValue();
         //Then
         Assertions.assertNotEquals(-1,sudokuElement.getValue());
     }
@@ -21,5 +21,16 @@ class SudokuElementTest {
         sudokuElement.removeFromPossibleValues(3);
         //Then
         Assertions.assertFalse(sudokuElement.getPossibleValues().contains(3));
+    }
+
+    @Test
+    void guessValueTest() {
+        //Given
+        SudokuElement sudokuElement = new SudokuElement();
+        //Then
+
+        //When
+
+
     }
 }

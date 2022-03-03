@@ -4,15 +4,15 @@ import java.util.Scanner;
 
 public class SudokuGame {
 
-    List<StateBeforeGuessing> states = new ArrayList<>();
+    List<State> states = new ArrayList<>();
     Board board = new Board();
     SudokuSolver sudokuSolver = new SudokuSolver(board);
 
     public void processingSudoku(){
         int tries = 0;
-        board.setDigit();
-        if (sudokuSolver.correctBoard()) {
-            while (board.countEmptyElements() != 0) {
+        board.enteringDigits();
+        if (sudokuSolver.isBoardCorrect()) {
+            while (!board.isFilled()) {
                 sudokuSolver.prepareValuesInElements();
                 boolean solved = sudokuSolver.settingOccurred();
                 if (!solved) {
@@ -21,18 +21,23 @@ public class SudokuGame {
                     tries = 0;
                 }
                 if (tries > 2) {
-                    StateBeforeGuessing stateBeforeGuessing = new StateBeforeGuessing();
-                    saveBoard(stateBeforeGuessing);
-                    SudokuElement guessedElement = sudokuSolver.guessTheValue();
-                    if (guessedElement != null && sudokuSolver.valid()) {
-                        definePreviousState(stateBeforeGuessing,guessedElement);
+                    State state = new State();
+                    state.addCopyOfBoard(board);
+                    SudokuElement guessedElement = sudokuSolver.goThroughTheBoardAndGuess();
+                    if (guessedElement != null && !board.hasWrongElements()) {
+                        saveStateAndGuessedElement(state,guessedElement);
                         tries = 0;
                     } else {
-                        StateBeforeGuessing previousState = states.get(states.size()-1);
-                        board = useBoardFromPreviousState(previousState);
+                        State previousState = states.get(states.size()-1);
 
-                        if (!sudokuSolver.valid()) {
-                            board = useStateFromBeforePreviousState(previousState);
+                        board = previousState.getBoardWithoutPreviouslyGuessedValue();
+                        sudokuSolver.setBoard(board);
+
+                        if (board.hasWrongElements()) {
+                            State beforePreviousState = getStateBeforePreviousState(previousState);
+                            states.remove(previousState);
+                            board = beforePreviousState.getBoardWithoutPreviouslyGuessedValue();
+                            sudokuSolver.setBoard(board);
                         }
                     }
                 }
@@ -43,7 +48,21 @@ public class SudokuGame {
         System.out.println(board);
     }
 
-    public boolean resolveSudoku() {
+    private void guessing() {
+        State state = new State();
+        state.addCopyOfBoard(board);
+        SudokuElement guessedElement = sudokuSolver.goThroughTheBoardAndGuess();
+
+
+    }
+
+
+    public State getStateBeforePreviousState(State state) {
+        int indexOfPreviousState = states.indexOf(state);
+        return states.get(indexOfPreviousState - 1);
+    }
+
+    public boolean solveAgain() {
         boolean correctAnswer = false;
         boolean gameFinished = false;
 
@@ -64,38 +83,14 @@ public class SudokuGame {
                 System.out.println("I don't understand your answer");
             }
         }
-    return gameFinished;
+        return gameFinished;
     }
 
-    public void definePreviousState(StateBeforeGuessing stateBeforeGuessing, SudokuElement guessedElement) {
-        states.add(stateBeforeGuessing);
-        stateBeforeGuessing.setGuessedElement(guessedElement);
-        stateBeforeGuessing.setPosition(board.findElement(guessedElement));
+    private void saveStateAndGuessedElement(State state, SudokuElement guessedElement) {
+        states.add(state);
+        state.setGuessedValue(guessedElement.getValue());
+        state.setPosition(board.getElementPosition(guessedElement));
     }
-
-    public Board useBoardFromPreviousState(StateBeforeGuessing previousState) {
-        Board board = sudokuSolver.setPreviousStateAndGetAdjustedBoard(previousState);
-        sudokuSolver.setBoard(board);
-        return board;
-    }
-
-    public void saveBoard(StateBeforeGuessing stateBeforeGuessing) {
-        try {
-            Board boardToSave = board.deepCopy();
-            stateBeforeGuessing.setBoard(boardToSave);
-        } catch (CloneNotSupportedException e) {
-            System.out.println("Deep copy not executed correctly");
-        }
-    }
-
-    public Board useStateFromBeforePreviousState(StateBeforeGuessing previousState) {
-        int indexOfPreviousState = states.indexOf(previousState);
-        previousState = states.get(indexOfPreviousState - 1);
-        board = useBoardFromPreviousState(previousState);
-        states.remove(indexOfPreviousState);
-        return board;
-    }
-
 
 }
 

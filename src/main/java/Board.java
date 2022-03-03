@@ -19,7 +19,7 @@ public class Board extends Prototype<Board> {
         return chosenRow.getElement(horizontalPosition-1);
     }
 
-    public void setDigit() {
+    public void enteringDigits() {
         boolean setting = true;
         Scanner scanner = new Scanner(System.in);
         System.out.println(this);
@@ -57,7 +57,6 @@ public class Board extends Prototype<Board> {
         }
     }
 
-
     public String toString() {
         String result = "";
         for (int y = minIndex; y <= maxIndex; y++) {
@@ -89,28 +88,33 @@ public class Board extends Prototype<Board> {
         return clonedBoard;
     }
 
-    public Position findElement(SudokuElement elementSearchedFor) {
-        Position position = new Position();
-        int verticalPos = -1;
-        int horizontalPos = -1;
-
+    public Position getElementPosition(SudokuElement elementSearchedFor) {
+        int verticalIndex = -1;
+        int horizontalIndex = -1;
         for (SudokuRow sudokuRow : sudokuBoard) {
-            verticalPos = sudokuBoard.indexOf(sudokuRow);
-            horizontalPos = sudokuRow.getRow().indexOf(elementSearchedFor);
-
-            if (horizontalPos != -1) {
+            verticalIndex = sudokuBoard.indexOf(sudokuRow);
+            horizontalIndex = sudokuRow.getRow().indexOf(elementSearchedFor);
+            if (horizontalIndex != -1) {
                 break;
             }
         }
-        position.setHorizontal(horizontalPos);
-        position.setVertical(verticalPos);
-        return position;
+        return new Position(horizontalIndex + 1, verticalIndex + 1);
     }
 
-    public int countEmptyElements() {
-        return (int) sudokuBoard.stream()
+    public boolean isFilled() {
+        int emptyElements = (int) sudokuBoard.stream()
                 .flatMap(l -> l.getRow().stream())
                 .filter(t -> t.getValue() == -1)
                 .count();
+        return emptyElements == 0;
+    }
+
+    public boolean hasWrongElements() {
+        int wrongElements = (int) getSudokuBoard().stream()
+                .flatMap(l -> l.getRow().stream())
+                .filter(t -> t.getValue() == -1)
+                .filter(t -> t.getPossibleValues().size() == 0)
+                .count();
+        return wrongElements > 0;
     }
 }

@@ -33,12 +33,11 @@ public class SudokuElement {
         }
     }
 
-    public void guessTheValueInElement() {
-        if (possibleValues.size() > 0) {
-            Random rand = new Random();
-            int newValue = possibleValues.get(rand.nextInt(getPossibleValues().size()));
-            setValue(newValue);
-        }
+    public void guessValue() { ///potestowac
+        Random rand = new Random();
+        int valueIndex = rand.nextInt(getPossibleValues().size());
+        int newValue = possibleValues.get(valueIndex);
+        setValue(newValue);
     }
 
     public void setLastPossibleValue() {
