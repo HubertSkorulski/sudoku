@@ -11,9 +11,9 @@ public class SudokuGame {
     public void processingSudoku(){
         int tries = 0;
         board.enteringDigits();
-        if (sudokuSolver.isBoardCorrect()) {
+        if (board.isCorrect()) {
             while (!board.isFilled()) {
-                sudokuSolver.prepareValuesInElements();
+                sudokuSolver.prepareValuesInElements(board);
                 boolean solved = sudokuSolver.settingOccurred();
                 if (!solved) {
                     tries ++;

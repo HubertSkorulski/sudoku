@@ -1,6 +1,8 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Board extends Prototype<Board> {
     public final static int minIndex = 0;
@@ -117,4 +119,95 @@ public class Board extends Prototype<Board> {
                 .count();
         return wrongElements > 0;
     }
+
+    public boolean isCorrect() {
+        if(valuesInRowsCorrect()) {
+            if (valuesInColumnsCorrect()) {
+                return valuesInSquareCorrect();
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private boolean valuesInRowsCorrect() {
+        boolean correct = true;
+        for (SudokuRow sudokuRow : sudokuBoard) {
+            List<Integer> rowValues = elementsListToValuesList(sudokuRow.getRow());
+            if (hasDuplicates(rowValues)) {
+                correct = false;
+                break;
+            }
+        }
+        return correct;
+    }
+
+    private boolean valuesInColumnsCorrect() {
+        boolean correct = true;
+        for (int n = 0; n < 9; n++) {
+            List<Integer> columnItems = elementsListToValuesList(columnToList(n));
+            if (hasDuplicates(columnItems)) {
+                correct = false;
+                break;
+            }
+        }
+        return correct;
+    }
+
+    private boolean valuesInSquareCorrect() {
+        boolean correct = true;
+        for (int hor=1; hor <10; hor= hor + 3) {
+            for (int ver = 1; ver < 10; ver = ver + 3) {
+                List<Integer> squareItems = elementsListToValuesList(squareToList(ver,hor));
+                if (hasDuplicates(squareItems)) {
+                    correct = false;
+                    break;
+                }
+            }
+            if (!correct) {
+                break;
+            }
+        }
+        return correct;
+    }
+
+    public List<SudokuElement> columnToList(int columnNumber) {
+        List<SudokuElement> columnItems = new ArrayList<>();
+        for (SudokuRow row : sudokuBoard) {
+            columnItems.add(row.getElement(columnNumber));
+        }
+        return columnItems;
+    }
+
+    public List<SudokuElement> squareToList(int ver, int hor) {
+        List<SudokuElement> elementList = new ArrayList<>();
+        for (int y = ver; y < 3 + ver; y = y + 1) {
+            for (int x = hor; x < 3 + hor; x = x + 1) {
+                elementList.add(getSudokuElement(x, y));
+            }
+        }
+        return elementList;
+    }
+
+    private List<Integer> elementsListToValuesList(List<SudokuElement> sudokuElements) {
+            List<Integer> listOfValues = sudokuElements.stream()
+                    .map(SudokuElement::getValue)
+                    .collect(Collectors.toList());
+            return listOfValues;
+    }
+
+    public boolean hasDuplicates(List<Integer> elementsValues) {
+        boolean wrong = false;
+        for (int i = 1; i < 10; i++) {
+            int occurrence = Collections.frequency(elementsValues,i);
+            if (occurrence > 1) {
+                wrong = true;
+                break;
+            }
+        }
+        return wrong;
+    }
+
 }
