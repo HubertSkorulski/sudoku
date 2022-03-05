@@ -31,6 +31,7 @@ public class SudokuGame {
             if (i>200) {
                 board = states.get(0).getBoard();
                 i=0;
+                states = new ArrayList<>();
             }
         }
         return board;
