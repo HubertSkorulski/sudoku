@@ -56,7 +56,7 @@ class BoardTest {
     void squareToListTest() {
         //Given
         Board board = new Board();
-        SudokuSolver sudokuSolver = new SudokuSolver(board);
+        //SudokuElementsSetter sudokuElementsSetter = new SudokuElementsSetter();
         board.handleTheInput(new Input("1,1,1"));
         board.handleTheInput(new Input("1,2,2"));
         board.handleTheInput(new Input("1,3,3"));
@@ -80,7 +80,7 @@ class BoardTest {
     void squareToList2Test() {
         //Given
         Board board = new Board();
-        SudokuSolver sudokuSolver = new SudokuSolver(board);
+        //SudokuElementsSetter sudokuElementsSetter = new SudokuElementsSetter(board);
         board.handleTheInput(new Input("4,1,1"));
         board.handleTheInput(new Input("4,2,2"));
         board.handleTheInput(new Input("4,3,3"));
@@ -107,7 +107,7 @@ class BoardTest {
         //Given
         Board board = new Board();
         //When
-        boolean check = board.hasWrongElements();
+        boolean check = board.hasImpossibleToSetElements();
         //Then
         Assertions.assertFalse(check);
     }
@@ -127,7 +127,7 @@ class BoardTest {
         sudokuElement.removeFromPossibleValues(8);
         sudokuElement.removeFromPossibleValues(9);
         //When
-        boolean check = board.hasWrongElements();
+        boolean check = board.hasImpossibleToSetElements();
         //Then
         Assertions.assertTrue(check);
     }

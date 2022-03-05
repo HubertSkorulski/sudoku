@@ -73,23 +73,6 @@ public class Board extends Prototype<Board> {
         return sudokuBoard;
     }
 
-    public Board deepCopy() throws CloneNotSupportedException {
-        Board clonedBoard = super.clone();
-
-        clonedBoard.sudokuBoard = new ArrayList<>();
-        for (SudokuRow sudokuRow : sudokuBoard) {
-            SudokuRow clonedRow = new SudokuRow();
-            clonedRow.getRow().clear();
-            for (SudokuElement sudokuElement : sudokuRow.getRow()) {
-                SudokuElement clonedElement = new SudokuElement();
-                clonedElement.setValue(sudokuElement.getValue());
-                clonedRow.getRow().add(clonedElement);
-            }
-            clonedBoard.getSudokuBoard().add(clonedRow);
-        }
-        return clonedBoard;
-    }
-
     public Position getElementPosition(SudokuElement elementSearchedFor) {
         int verticalIndex = -1;
         int horizontalIndex = -1;
@@ -111,7 +94,7 @@ public class Board extends Prototype<Board> {
         return emptyElements == 0;
     }
 
-    public boolean hasWrongElements() {
+    public boolean hasImpossibleToSetElements() {
         int wrongElements = (int) getSudokuBoard().stream()
                 .flatMap(l -> l.getRow().stream())
                 .filter(t -> t.getValue() == -1)
@@ -123,13 +106,25 @@ public class Board extends Prototype<Board> {
     public boolean isCorrect() {
         if(valuesInRowsCorrect()) {
             if (valuesInColumnsCorrect()) {
-                return valuesInSquareCorrect();
+                return valuesInSquaresCorrect();
             } else {
                 return false;
             }
         } else {
             return false;
         }
+    }
+
+    public boolean hasDuplicates(List<Integer> elementsValues) {
+        boolean wrong = false;
+        for (int i = 1; i < 10; i++) {
+            int occurrence = Collections.frequency(elementsValues,i);
+            if (occurrence > 1) {
+                wrong = true;
+                break;
+            }
+        }
+        return wrong;
     }
 
     private boolean valuesInRowsCorrect() {
@@ -156,7 +151,7 @@ public class Board extends Prototype<Board> {
         return correct;
     }
 
-    private boolean valuesInSquareCorrect() {
+    private boolean valuesInSquaresCorrect() {
         boolean correct = true;
         for (int hor=1; hor <10; hor= hor + 3) {
             for (int ver = 1; ver < 10; ver = ver + 3) {
@@ -198,16 +193,23 @@ public class Board extends Prototype<Board> {
             return listOfValues;
     }
 
-    public boolean hasDuplicates(List<Integer> elementsValues) {
-        boolean wrong = false;
-        for (int i = 1; i < 10; i++) {
-            int occurrence = Collections.frequency(elementsValues,i);
-            if (occurrence > 1) {
-                wrong = true;
-                break;
+    public Board deepCopy() throws CloneNotSupportedException {
+        Board clonedBoard = super.clone();
+
+        clonedBoard.sudokuBoard = new ArrayList<>();
+        for (SudokuRow sudokuRow : sudokuBoard) {
+            SudokuRow clonedRow = new SudokuRow();
+            clonedRow.getRow().clear();
+            for (SudokuElement sudokuElement : sudokuRow.getRow()) {
+                SudokuElement clonedElement = new SudokuElement();
+                clonedElement.setValue(sudokuElement.getValue());
+                clonedRow.getRow().add(clonedElement);
             }
+            clonedBoard.getSudokuBoard().add(clonedRow);
         }
-        return wrong;
+        return clonedBoard;
     }
+
+
 
 }

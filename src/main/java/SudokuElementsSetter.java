@@ -4,32 +4,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class SudokuSolver {
-    private Board board;
-
-    public void setBoard(Board board) {
-        this.board = board;
-    }
-
-    public SudokuSolver(Board board) {
-        this.board = board;
-    }
-
+public class SudokuElementsSetter {
     public void prepareValuesInElements(Board board) {
         removePossibleValuesFromRow(board);
         removePossibleValuesFromColumn(board);
         removePossibleValuesFromSquares(board);
     }
     
-    public boolean settingOccurred() {
+    public boolean settingOccurred(Board board) {
         List<Integer> boardPreviousValues = boardToList(board);
-        settingValues();
+        settingValues(board);
         List<Integer> boardCurrentValues = boardToList(board);
-        if (boardPreviousValues.equals(boardCurrentValues)) {
-            return false;
-        } else {
-            return true;
-        }
+        return !boardPreviousValues.equals(boardCurrentValues);
     }
 
     public List<Integer> boardToList(Board board) {
@@ -39,7 +25,7 @@ public class SudokuSolver {
                 .collect(Collectors.toList());
     }
 
-    public void settingValues() {
+    public void settingValues(Board board) {
         boolean set = false;
         for (SudokuRow sudokuRow : board.getSudokuBoard()) {
             for (SudokuElement sudokuElement : sudokuRow.getRow()) {
@@ -56,12 +42,7 @@ public class SudokuSolver {
     }
 
     private boolean fieldIsEmptyAndOnePossibleValueLeft (SudokuElement sudokuElement) {
-        if (sudokuElement.getPossibleValues().size() == 1 && sudokuElement.getValue() == -1) {
-            return true;
-        } else {
-            return false;
-        }
-
+        return sudokuElement.getPossibleValues().size() == 1 && sudokuElement.getValue() == -1;
     }
 
     public void removePossibleValuesFromSquares(Board board) {
@@ -98,7 +79,11 @@ public class SudokuSolver {
         }
     }
 
-    public SudokuElement goThroughTheBoardAndGuess() {
+    private boolean guessingPossible(SudokuElement sudokuElement) {
+        return sudokuElement.isEmpty() & sudokuElement.getPossibleValues().size() > 1;
+    }
+
+    public SudokuElement goThroughTheBoardAndGuess(Board board) {
         boolean guessedAndSet = false;
         SudokuElement guessedElement = null;
 
@@ -117,9 +102,4 @@ public class SudokuSolver {
         }
         return guessedElement;
     }
-
-    private boolean guessingPossible(SudokuElement sudokuElement) {
-        return sudokuElement.isEmpty() & sudokuElement.getPossibleValues().size() > 1;
-    }
-
 }
