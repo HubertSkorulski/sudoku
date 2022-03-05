@@ -67,7 +67,7 @@ public class SudokuGame {
         return states.get(indexOfPreviousState - 1);
     }
 
-    public boolean solveAgain() {
+    public boolean play() {
         boolean correctAnswer = false;
         boolean gameFinished = false;
 

@@ -4,7 +4,7 @@ public class Game {
         boolean gameFinished = false;
         while(!gameFinished) {
             SudokuGame theGame = new SudokuGame();
-            gameFinished = theGame.solveAgain();
+            gameFinished = theGame.play();
         }
     }
 }
