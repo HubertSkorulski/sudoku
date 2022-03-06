@@ -19,21 +19,25 @@ public class SudokuGame {
     }
 
     private Board solveTheSudoku(Board board) {
-        int i=0;
+        int tries=0;
         while (!board.isFilled()) {
             sudokuElementsSetter.prepareValuesInElements(board);
             boolean solved = sudokuElementsSetter.settingOccurred(board);
-
             if (!solved) {
                 board = guess(board);
-                i++;
+                tries++;
             }
-            if (i>200) {
-                board = states.get(0).getBoard();
-                i=0;
-                states = new ArrayList<>();
+            if (tries == 100) {
+                board = restartGuessing();
+                tries = 0;
             }
         }
+        return board;
+    }
+
+    private Board restartGuessing() {
+        board = states.get(0).getBoard();
+        states = new ArrayList<>();
         return board;
     }
 
@@ -42,17 +46,20 @@ public class SudokuGame {
         state.addCopyOfBoard(board);
         SudokuElement guessedElement = sudokuElementsSetter.goThroughTheBoardAndGuess(board);
         if (!board.hasImpossibleToSetElements()) {
-            Position positionOfGuessedElement = board.getElementPosition(guessedElement);
-            saveState(state,guessedElement, positionOfGuessedElement);
+            saveState(state,guessedElement, board.getElementPosition(guessedElement));
         } else {
-            State previousState = states.get(states.size()-1);
-            board = previousState.getBoardWithoutPreviouslyGuessedValue();
+            board = useStateBefore();
             if (board.hasImpossibleToSetElements()) {
-                State beforePreviousState = getStateBeforePreviousState(previousState);
-                states.remove(previousState);
-                board = beforePreviousState.getBoardWithoutPreviouslyGuessedValue();
+                board = useStateBefore();
             }
         }
+        return board;
+    }
+
+    private Board useStateBefore() {
+        State previousState = states.get(states.size()-1);
+        board = previousState.getBoardWithoutPreviouslyGuessedValue();
+        states.remove(previousState);
         return board;
     }
 
@@ -60,11 +67,6 @@ public class SudokuGame {
         states.add(state);
         state.setGuessedValue(guessedElement.getValue());
         state.setPosition(position);
-    }
-
-    public State getStateBeforePreviousState(State state) {
-        int indexOfPreviousState = states.indexOf(state);
-        return states.get(indexOfPreviousState - 1);
     }
 
     public boolean play() {
