@@ -9,16 +9,14 @@ public class Board extends Prototype<Board> {
     public final static int maxIndex = 8;
     private List<SudokuRow> sudokuBoard = new ArrayList<>();
 
-
     public Board() {
         for (int n = 0; n <= maxIndex; n++) {
             sudokuBoard.add(new SudokuRow());
         }
     }
 
-    public SudokuElement getSudokuElement(int horizontalPosition, int verticalPosition) {
-        SudokuRow chosenRow = sudokuBoard.get(verticalPosition-1);
-        return chosenRow.getElement(horizontalPosition-1);
+    public List<SudokuRow> getSudokuBoard() {
+        return sudokuBoard;
     }
 
     public void enteringDigits() {
@@ -28,7 +26,7 @@ public class Board extends Prototype<Board> {
 
         while (setting) {
             System.out.println("Enter parameters in the format: 'Vertical Position, Horizontal Position, Value'"
-                    + "\n" +"If you want to solve SUDOKU, enter 'SUDOKU'");
+                    + "\n" + "If you want to solve SUDOKU, enter 'SUDOKU'");
             String input = scanner.nextLine();
             if (input.equalsIgnoreCase("SUDOKU")) {
                 setting = false;
@@ -46,7 +44,7 @@ public class Board extends Prototype<Board> {
             int horizontalPos = input.getHorizontalPos();
             int verticalPos = input.getVerticalPos();
 
-            SudokuElement chosenElement = getSudokuElement(horizontalPos,verticalPos);
+            SudokuElement chosenElement = getSudokuElement(horizontalPos, verticalPos);
 
             if (chosenElement.isEmpty()) {
                 chosenElement.setValue(value);
@@ -59,18 +57,10 @@ public class Board extends Prototype<Board> {
         }
     }
 
-    public String toString() {
-        String result = "";
-        for (int y = minIndex; y <= maxIndex; y++) {
-            SudokuRow currentRow = sudokuBoard.get(y);
-            result += currentRow.toString();
-            result += "\n";
-        }
-        return result;
-    }
 
-    public List<SudokuRow> getSudokuBoard() {
-        return sudokuBoard;
+    public SudokuElement getSudokuElement(int horizontalPosition, int verticalPosition) {
+        SudokuRow chosenRow = sudokuBoard.get(verticalPosition - 1);
+        return chosenRow.getElement(horizontalPosition - 1);
     }
 
     public Position getElementPosition(SudokuElement elementSearchedFor) {
@@ -84,6 +74,16 @@ public class Board extends Prototype<Board> {
             }
         }
         return new Position(horizontalIndex + 1, verticalIndex + 1);
+    }
+
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (int y = minIndex; y <= maxIndex; y++) {
+            SudokuRow currentRow = sudokuBoard.get(y);
+            result.append(currentRow.toString());
+            result.append("\n");
+        }
+        return result.toString();
     }
 
     public boolean isFilled() {
@@ -104,7 +104,7 @@ public class Board extends Prototype<Board> {
     }
 
     public boolean isCorrect() {
-        if(valuesInRowsCorrect()) {
+        if (valuesInRowsCorrect()) {
             if (valuesInColumnsCorrect()) {
                 return valuesInSquaresCorrect();
             } else {
@@ -118,7 +118,7 @@ public class Board extends Prototype<Board> {
     public boolean hasDuplicates(List<Integer> elementsValues) {
         boolean wrong = false;
         for (int i = 1; i < 10; i++) {
-            int occurrence = Collections.frequency(elementsValues,i);
+            int occurrence = Collections.frequency(elementsValues, i);
             if (occurrence > 1) {
                 wrong = true;
                 break;
@@ -153,9 +153,9 @@ public class Board extends Prototype<Board> {
 
     private boolean valuesInSquaresCorrect() {
         boolean correct = true;
-        for (int hor=1; hor <10; hor= hor + 3) {
+        for (int hor = 1; hor < 10; hor = hor + 3) {
             for (int ver = 1; ver < 10; ver = ver + 3) {
-                List<Integer> squareItems = elementsListToValuesList(squareToList(ver,hor));
+                List<Integer> squareItems = elementsListToValuesList(squareToList(ver, hor));
                 if (hasDuplicates(squareItems)) {
                     correct = false;
                     break;
@@ -187,10 +187,9 @@ public class Board extends Prototype<Board> {
     }
 
     private List<Integer> elementsListToValuesList(List<SudokuElement> sudokuElements) {
-            List<Integer> listOfValues = sudokuElements.stream()
-                    .map(SudokuElement::getValue)
-                    .collect(Collectors.toList());
-            return listOfValues;
+        return sudokuElements.stream()
+                .map(SudokuElement::getValue)
+                .collect(Collectors.toList());
     }
 
     public Board deepCopy() throws CloneNotSupportedException {
@@ -209,7 +208,4 @@ public class Board extends Prototype<Board> {
         }
         return clonedBoard;
     }
-
-
-
 }

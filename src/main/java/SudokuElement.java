@@ -5,7 +5,7 @@ import java.util.Random;
 public class SudokuElement {
 
     private int value = -1;
-    private List<Integer> possibleValues = new ArrayList<>();
+    private final List<Integer> possibleValues = new ArrayList<>();
 
     public SudokuElement() {
         for (int i =1; i<10; i++) {
@@ -17,12 +17,31 @@ public class SudokuElement {
         return possibleValues;
     }
 
+    public int getValue(){
+        return value;
+    }
+
     public void setValue(int value) {
         this.value = value;
     }
 
-    public int getValue(){
-        return value;
+    public void setLastPossibleValue() {
+        setValue(possibleValues.get(0));
+    }
+
+    public void guessValue() {
+        Random rand = new Random();
+        int valueIndex = rand.nextInt(getPossibleValues().size());
+        int newValue = possibleValues.get(valueIndex);
+        setValue(newValue);
+    }
+
+    public boolean isEmpty() {
+        return getValue() == -1;
+    }
+
+    public void removeFromPossibleValues(int value) {
+        getPossibleValues().remove(Integer.valueOf(value));
     }
 
     public String toString() {
@@ -31,28 +50,5 @@ public class SudokuElement {
         } else  {
             return String.valueOf(value);
         }
-    }
-
-    public void guessValue() { ///potestowac
-        Random rand = new Random();
-        int valueIndex = rand.nextInt(getPossibleValues().size());
-        int newValue = possibleValues.get(valueIndex);
-        setValue(newValue);
-    }
-
-    public void setLastPossibleValue() {
-        setValue(possibleValues.get(0));
-    }
-
-    public boolean isEmpty() {
-        if (getValue() == -1) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void removeFromPossibleValues(int value) {
-        getPossibleValues().remove(Integer.valueOf(value));
     }
 }

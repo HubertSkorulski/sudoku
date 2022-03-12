@@ -3,10 +3,10 @@ import java.util.List;
 
 public class SudokuRow {
 
-    private int width = 9;
-    private List<SudokuElement> row = new ArrayList<>();
+    private final List<SudokuElement> row = new ArrayList<>();
 
     public SudokuRow() {
+        int width = 9;
         for (int i = 0; i < width; i++) {
             row.add(new SudokuElement());
         }
@@ -21,10 +21,10 @@ public class SudokuRow {
     }
 
     public String toString() {
-        String oneRowList = "|";
+        StringBuilder oneRowList = new StringBuilder("|");
         for (SudokuElement sudokuElement : row) {
-            oneRowList = oneRowList + sudokuElement.toString() + "|";
+            oneRowList.append(sudokuElement.toString()).append("|");
         }
-        return oneRowList;
+        return oneRowList.toString();
     }
 }

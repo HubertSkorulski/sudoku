@@ -1,7 +1,7 @@
 public class Position {
 
-    private int horizontal;
-    private int vertical;
+    private final int horizontal;
+    private final int vertical;
 
     public Position(int horizontal, int vertical) {
         this.horizontal = horizontal;

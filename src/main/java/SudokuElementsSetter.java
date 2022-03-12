@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +50,6 @@ public class SudokuElementsSetter {
             for (int ver = 1; ver < 10; ver = ver + 3) {
                 elementsList = board.squareToList(ver,hor);
                 removePossibleValuesFromList(elementsList);
-                elementsList = new ArrayList<>();
             }
         }
     }

@@ -41,29 +41,17 @@ public class Input {
 
     public boolean isCorrect() {
         if (input.length() == 5) {
-            if (valuesInList() & correctComas()) {
-                return true;
-            } else {
-                return false;
-            }
+            return correctValuesInInput() & correctComas();
         }   else {
             return false;
         }
     }
 
-    private boolean valuesInList() {
-        if(getValue() != -1 & getHorizontalPos() != -1 & getVerticalPos() != -1) {
-            return true;
-        } else {
-            return false;
-        }
+    private boolean correctValuesInInput() {
+        return getValue() != -1 & getHorizontalPos() != -1 & getVerticalPos() != -1;
     }
 
     private boolean correctComas() {
-        if (input.charAt(1) == ',' & input.charAt(3) == ',') {
-            return true;
-        } else {
-            return false;
-        }
+        return input.charAt(1) == ',' & input.charAt(3) == ',';
     }
 }
